@@ -1,10 +1,11 @@
-package jid
+package jiq
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewEngine(t *testing.T) {
@@ -217,16 +218,6 @@ func TestTabAction(t *testing.T) {
 	e.candidatemode = false
 	e.tabAction()
 	assert.Equal(".NameTest", e.query.StringGet())
-
-	_, e.complete, _, _ = e.manager.GetPretty(e.query, true)
-	e.candidatemode = false
-	e.tabAction()
-	assert.Equal(".NameTest[", e.query.StringGet())
-
-	_, e.complete, _, _ = e.manager.GetPretty(e.query, true)
-	e.candidatemode = false
-	e.tabAction()
-	assert.Equal(".NameTest[", e.query.StringGet())
 }
 
 func TestEscAction(t *testing.T) {

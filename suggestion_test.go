@@ -1,4 +1,4 @@
-package jid
+package jiq
 
 import (
 	"bytes"

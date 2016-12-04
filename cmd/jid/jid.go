@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/simeji/jid"
 	"os"
+
+	"github.com/fiatjaf/jiq"
 )
 
 func main() {
@@ -15,11 +16,11 @@ func main() {
 	flag.BoolVar(&query, "q", false, "output query")
 	flag.Parse()
 
-	e := jid.NewEngine(content)
+	e := jiq.NewEngine(content)
 	os.Exit(run(e, query))
 }
 
-func run(e jid.EngineInterface, query bool) int {
+func run(e jiq.EngineInterface, query bool) int {
 
 	result := e.Run()
 	if result.GetError() != nil {

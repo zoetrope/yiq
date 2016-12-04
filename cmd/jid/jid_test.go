@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/simeji/jid"
+	"github.com/simeji/jiq"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -16,7 +16,7 @@ func TestMain(m *testing.M) {
 	defer os.Exit(code)
 }
 
-func TestjidRun(t *testing.T) {
+func TestjiqRun(t *testing.T) {
 	var assert = assert.New(t)
 
 	e := &EngineMock{err: nil}
@@ -31,7 +31,7 @@ func TestjidRun(t *testing.T) {
 	assert.Zero(result)
 }
 
-func TestjidRunWithError(t *testing.T) {
+func TestjiqRunWithError(t *testing.T) {
 	called = 0
 	var assert = assert.New(t)
 	e := &EngineMock{err: fmt.Errorf("")}
@@ -42,11 +42,11 @@ func TestjidRunWithError(t *testing.T) {
 
 type EngineMock struct{ err error }
 
-func (e *EngineMock) Run() jid.EngineResultInterface {
+func (e *EngineMock) Run() jiq.EngineResultInterface {
 	return &EngineResultMock{err: e.err}
 }
-func (e *EngineMock) GetQuery() jid.QueryInterface {
-	return jid.NewQuery([]rune(""))
+func (e *EngineMock) GetQuery() jiq.QueryInterface {
+	return jiq.NewQuery([]rune(""))
 }
 
 type EngineResultMock struct{ err error }

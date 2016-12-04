@@ -1,4 +1,4 @@
-package jid
+package jiq
 
 import (
 	"regexp"
@@ -46,9 +46,7 @@ func (q *Query) Get() []rune {
 }
 
 func (q *Query) Set(query []rune) []rune {
-	if validate(query) {
-		q.query = &query
-	}
+	q.query = &query
 	return q.Get()
 }
 
@@ -184,27 +182,4 @@ func (q *Query) StringGetKeywords() []string {
 func (q *Query) StringPopKeyword() (string, []rune) {
 	keyword, query := q.PopKeyword()
 	return string(keyword), query
-}
-
-func validate(r []rune) bool {
-	s := string(r)
-	if s == "" {
-		return true
-	}
-	if regexp.MustCompile(`^[^.]`).MatchString(s) {
-		return false
-	}
-	if regexp.MustCompile(`\.{2,}`).MatchString(s) {
-		return false
-	}
-	if regexp.MustCompile(`\[[0-9]*\][^\.\[]`).MatchString(s) {
-		return false
-	}
-	if regexp.MustCompile(`\[{2,}|\]{2,}`).MatchString(s) {
-		return false
-	}
-	if regexp.MustCompile(`.\.\[`).MatchString(s) {
-		return false
-	}
-	return true
 }

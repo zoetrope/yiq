@@ -1,4 +1,4 @@
-# jid
+# jiq
 Json Incremental Digger
 
 It's very simple tool.  
@@ -6,30 +6,30 @@ You can drill down interactively by using filtering queries like [jq](https://st
 
 ## Demo
 
-![demo-jid-main](https://github.com/simeji/jid/wiki/images/demo-jid-main-640.gif)
+![demo-jiq-main](https://github.com/simeji/jiq/wiki/images/demo-jiq-main-640.gif)
 
 ## Installation
 
 * [With homebrew taps (for Mac)](#with-homebrew-taps-for-mac)  
-* [Simply use "jid" command](#simply-use-jid-command)  
-* [Build "jid" command by yourself](#build-jid-command-by-yourself)  
+* [Simply use "jiq" command](#simply-use-jiq-command)  
+* [Build "jiq" command by yourself](#build-jiq-command-by-yourself)  
 
 ### With homebrew taps (for Mac)
 
 ```
-brew tap simeji/jid
-brew install jid
+brew tap simeji/jiq
+brew install jiq
 ```
 
-### Simply use "jid" command
+### Simply use "jiq" command
 
-If you simply want to use `jid` command, please download binary from below.
+If you simply want to use `jiq` command, please download binary from below.
 
-https://github.com/simeji/jid/releases
+https://github.com/simeji/jiq/releases
 
-### Build "jid" command by yourself
+### Build "jiq" command by yourself
 
-jid require some packages.
+jiq require some packages.
 Please `go get` below packages.
 
 [bitly/go-simplejson](https://github.com/bitly/go-simplejson)  
@@ -50,10 +50,10 @@ Please `go get` below packages.
 Please execute the below command.
 
 ```
-echo '{"aa":"2AA2","bb":{"aaa":[123,"cccc",[1,2]],"c":321}}'| jid
+echo '{"aa":"2AA2","bb":{"aaa":[123,"cccc",[1,2]],"c":321}}'| jiq
 ```
 
-then, jid will be running.
+then, jiq will be running.
 
 You can dig JSON data incrementally.
 
@@ -71,9 +71,9 @@ Then, you press Enter key and output `[1,2]` and exit.
 
 #### simple json example2
 
-This json is used by [demo section](https://github.com/simeji/jid#demo).
+This json is used by [demo section](https://github.com/simeji/jiq#demo).
 ```
-echo '{"info":{"date":"2016-10-23","version":1.0},"users":[{"name":"simeji","uri":"https://github.com/simeji","id":1},{"name":"simeji2","uri":"https://example.com/simeji","id":2},{"name":"simeji3","uri":"https://example.com/simeji3","id":3}],"userCount":3}}'|jid
+echo '{"info":{"date":"2016-10-23","version":1.0},"users":[{"name":"simeji","uri":"https://github.com/simeji","id":1},{"name":"simeji2","uri":"https://example.com/simeji","id":2},{"name":"simeji3","uri":"https://example.com/simeji3","id":3}],"userCount":3}}'|jiq
 ```
 
 #### with curl
@@ -81,7 +81,7 @@ echo '{"info":{"date":"2016-10-23","version":1.0},"users":[{"name":"simeji","uri
 Sample for using [RDAP](https://datatracker.ietf.org/wg/weirds/documents/) data.
 
 ```
-curl -s http://rdg.afilias.info/rdap/domain/example.info | jid
+curl -s http://rdg.afilias.info/rdap/domain/example.info | jiq
 ```
 
 ## Keymaps

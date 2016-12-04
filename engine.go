@@ -1,7 +1,8 @@
-package jid
+package jiq
 
 import (
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"github.com/nsf/termbox-go"
@@ -24,7 +25,7 @@ type EngineResultInterface interface {
 }
 
 type Engine struct {
-	manager       *JsonManager
+	json          string
 	query         QueryInterface
 	term          *Terminal
 	complete      []string
@@ -38,12 +39,12 @@ type Engine struct {
 }
 
 func NewEngine(s io.Reader) EngineInterface {
-	j, err := NewJsonManager(s)
+	j, err := ioutil.ReadAll(s)
 	if err != nil {
 		return &Engine{}
 	}
 	e := &Engine{
-		manager:       j,
+		json:          string(j),
 		term:          NewTerminal(FilterPrompt, DefaultY),
 		query:         NewQuery([]rune("")),
 		complete:      []string{"", ""},
@@ -135,7 +136,8 @@ func (e *Engine) Run() EngineResultInterface {
 				e.escapeCandidateMode()
 			case termbox.KeyEnter:
 				if !e.candidatemode {
-					cc, _, _, err := e.manager.Get(e.query, true)
+					cc, err := jqrun(e.query.StringGet(), e.json)
+
 					return &EngineResult{
 						content: cc,
 						qs:      e.query.StringGet(),
@@ -156,13 +158,14 @@ func (e *Engine) Run() EngineResultInterface {
 }
 
 func (e *Engine) getContents() []string {
-	var c string
 	var contents []string
-	c, e.complete, e.candidates, _ = e.manager.GetPretty(e.query, e.queryConfirm)
+
+	cc, _ := jqrun(e.query.StringGet(), e.json)
+
 	if e.keymode {
 		contents = e.candidates
 	} else {
-		contents = strings.Split(c, "\n")
+		contents = strings.Split(cc, "\n")
 	}
 	return contents
 }
