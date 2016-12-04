@@ -3,7 +3,8 @@
 It's [jid](https://github.com/simeji/jid) with [jq](https://stedolan.github.io/jq/).
 
 You can drill down interactively by using [jq](https://stedolan.github.io/jq/) filtering queries.
-jiq uses [jq](https://stedolan.github.io/jq/) internally, and it **requires** you to have "jq" in your PATH.
+
+jiq uses [jq](https://stedolan.github.io/jq/) internally, and it **requires** you to have `jq` in your `PATH`.
 
 ## Demo
 
@@ -28,21 +29,19 @@ https://github.com/fiatjaf/jiq/releases
 
 ### Quick start
 
-* [simple json example](#simple-json-example)  
-* [another example](#another-example)
+* [simple example](#simple-example)  
+* [advanced usage examples](#advanced-usage-examples)
 * [with curl](#with-curl)  
 
-#### simple json example
+#### simple example
 
-execute the following command.
+Execute the following command:
 
 ```
 echo '{"aa":"2AA2","bb":{"aaa":[123,"cccc",[1,2]],"c":321}}'| jiq
 ```
 
-then jiq will be running.
-
-You can dig JSON data incrementally.
+Then jiq will be running. Now you can dig JSON data incrementally.
 
 When you enter `.bb.aaa[2]`, you will see the following.
 
@@ -54,14 +53,26 @@ When you enter `.bb.aaa[2]`, you will see the following.
 ]
 ```
 
-Then, you press Enter key and output `[1,2]` and exit.
+If you press Enter now it will output
 
-#### another example
+```json
+[
+  1,
+  2
+]
+```
 
-This json is used by [demo section](https://github.com/fiatjaf/jiq#demo).
+and exit
+
+#### advanced usage examples
+
+If you have ever used jq, you'll be familiar with these:
+
 ```
-echo '{"info":{"date":"2016-10-23","version":1.0},"users":[{"name":"fiatjaf","uri":"https://github.com/fiatjaf","id":1},{"name":"fiatjaf2","uri":"https://example.com/fiatjaf","id":2},{"name":"fiatjaf3","uri":"https://example.com/fiatjaf3","id":3}],"userCount":3}}'|jiq
+echo '{"economists": [{"id": 1, "name": "menger"}, {"id": 2, "name": "mises"}, {"name": "hayek", "id": 3}]}' | jiq
 ```
+
+Now try writing `.economists | "\(.[0].name), \(.[1].name) and \(.[2].name) are economists."` or `[.economists.[]].id`, or even `.economists | map({key: "\(.id)", value: .name}) | from_entries`
 
 #### with curl
 
