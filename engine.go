@@ -112,6 +112,8 @@ func (e *Engine) Run() EngineResultInterface {
 			switch ev.Key {
 			case 0:
 				e.inputChar(ev.Ch)
+			case termbox.KeySpace:
+				e.inputChar(32)
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
 				e.deleteChar()
 			case termbox.KeyTab:
