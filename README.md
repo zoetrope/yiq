@@ -12,18 +12,11 @@ jiq uses [jq](https://stedolan.github.io/jq/) internally, and it **requires** yo
 
 ## Installation
 
-* [Simply use "jiq" command](#simply-use-jiq-command)  
-* [Build "jiq" command by yourself](#build-jiq-command-by-yourself)  
+You can either download a binary (a single file!) from [here](https://gobuilder.me/github.com/fiatjaf/jiq/cmd/jiq) or build `jiq` command by yourself with `go get`:
 
-### Simply use "jiq" command
-
-If you simply want to use `jiq` command, please download binary from below.
-
-https://github.com/fiatjaf/jiq/releases
-
-### Build "jiq" command by yourself
-
-`go get github.com/fiatjaf/jiq/cmd/jiq`
+```
+go get github.com/fiatjaf/jiq/cmd/jiq
+```
 
 ## Usage
 
