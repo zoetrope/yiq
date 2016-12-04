@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -11,22 +10,27 @@ import (
 func main() {
 	content := os.Stdin
 
-	var query bool
+	outputquery := false
+	jqargs := os.Args[1:]
+	for i, arg := range os.Args[1:] {
+		if arg == "-q" {
+			outputquery = true
+			jqargs = os.Args[1 : i-1]
+			jqargs = append(jqargs, os.Args[i:]...)
+			break
+		}
+	}
 
-	flag.BoolVar(&query, "q", false, "output query")
-	flag.Parse()
-
-	e := jiq.NewEngine(content)
-	os.Exit(run(e, query))
+	e := jiq.NewEngine(content, jqargs)
+	os.Exit(run(e, outputquery))
 }
 
-func run(e jiq.EngineInterface, query bool) int {
-
+func run(e jiq.EngineInterface, outputquery bool) int {
 	result := e.Run()
 	if result.GetError() != nil {
 		return 2
 	}
-	if query {
+	if outputquery {
 		fmt.Printf("%s", result.GetQueryString())
 	} else {
 		fmt.Printf("%s", result.GetContent())

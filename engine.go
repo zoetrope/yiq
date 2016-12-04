@@ -27,6 +27,7 @@ type EngineResultInterface interface {
 type Engine struct {
 	json          string
 	query         QueryInterface
+	args          []string
 	term          *Terminal
 	complete      []string
 	keymode       bool
@@ -38,7 +39,7 @@ type Engine struct {
 	cursorOffsetX int
 }
 
-func NewEngine(s io.Reader) EngineInterface {
+func NewEngine(s io.Reader, args []string) EngineInterface {
 	j, err := ioutil.ReadAll(s)
 	if err != nil {
 		return &Engine{}
@@ -47,6 +48,7 @@ func NewEngine(s io.Reader) EngineInterface {
 		json:          string(j),
 		term:          NewTerminal(FilterPrompt, DefaultY),
 		query:         NewQuery([]rune("")),
+		args:          args,
 		complete:      []string{"", ""},
 		keymode:       false,
 		candidates:    []string{},
@@ -140,7 +142,7 @@ func (e *Engine) Run() EngineResultInterface {
 				e.escapeCandidateMode()
 			case termbox.KeyEnter:
 				if !e.candidatemode {
-					cc, err := jqrun(e.query.StringGet(), e.json)
+					cc, err := jqrun(e.query.StringGet(), e.json, e.args)
 
 					return &EngineResult{
 						content: cc,
@@ -164,7 +166,7 @@ func (e *Engine) Run() EngineResultInterface {
 func (e *Engine) getContents() []string {
 	var contents []string
 
-	cc, _ := jqrun(e.query.StringGet(), e.json)
+	cc, _ := jqrun(e.query.StringGet(), e.json, e.args)
 
 	if e.keymode {
 		contents = e.candidates

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func jqrun(query string, json string) (res string, err error) {
+func jqrun(query string, json string, opts []string) (res string, err error) {
 	if query == "" {
 		query = "."
 	}
@@ -17,7 +17,6 @@ func jqrun(query string, json string) (res string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	var b bytes.Buffer
 
-	opts := []string{}
 	opts = append(opts, query)
 	cmd := exec.Command("jq", opts...)
 	cmd.Stdin = bytes.NewBufferString(json)
@@ -33,9 +32,7 @@ func jqrun(query string, json string) (res string, err error) {
 	go func() { c <- cmd.Wait() }()
 	select {
 	case err = <-c:
-		if err != nil {
-			return
-		}
+		cancel()
 	case <-ctx.Done():
 		cmd.Process.Kill()
 		<-c // Wait for it to return.
