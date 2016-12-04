@@ -116,6 +116,8 @@ func (e *Engine) Run() EngineResultInterface {
 				e.inputChar(32)
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
 				e.deleteChar()
+			case termbox.KeyDelete:
+				e.deleteNextChar()
 			case termbox.KeyTab:
 				e.tabAction()
 			case termbox.KeyArrowLeft, termbox.KeyCtrlB:
@@ -199,6 +201,9 @@ func (e *Engine) deleteChar() {
 		_ = e.query.Delete(e.cursorOffsetX - 1)
 		e.cursorOffsetX -= 1
 	}
+}
+func (e *Engine) deleteNextChar() {
+	e.query.Delete(e.cursorOffsetX)
 }
 func (e *Engine) scrollToBelow() {
 	e.contentOffset++
