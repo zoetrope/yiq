@@ -27,5 +27,4 @@ _testmain.go
 test.*
 
 # jiq package
-jiq
 *.out

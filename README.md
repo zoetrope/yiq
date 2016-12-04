@@ -1,59 +1,46 @@
 # jiq
-Json Incremental Digger
 
-It's very simple tool.  
-You can drill down interactively by using filtering queries like [jq](https://stedolan.github.io/jq/).
+It's [jid](https://github.com/simeji/jid) with [jq](https://stedolan.github.io/jq/).
+
+You can drill down interactively by using [jq](https://stedolan.github.io/jq/) filtering queries.
+jiq uses [jq](https://stedolan.github.io/jq/) internally, and it **requires** you to have "jq" in your PATH.
 
 ## Demo
 
-![demo-jiq-main](https://github.com/simeji/jiq/wiki/images/demo-jiq-main-640.gif)
+![demo-jiq-main](https://github.com/simeji/jid/wiki/images/demo-jid-main-640.gif)
 
 ## Installation
 
-* [With homebrew taps (for Mac)](#with-homebrew-taps-for-mac)  
 * [Simply use "jiq" command](#simply-use-jiq-command)  
 * [Build "jiq" command by yourself](#build-jiq-command-by-yourself)  
-
-### With homebrew taps (for Mac)
-
-```
-brew tap simeji/jiq
-brew install jiq
-```
 
 ### Simply use "jiq" command
 
 If you simply want to use `jiq` command, please download binary from below.
 
-https://github.com/simeji/jiq/releases
+https://github.com/fiatjaf/jiq/releases
 
 ### Build "jiq" command by yourself
 
-jiq require some packages.
-Please `go get` below packages.
-
-[bitly/go-simplejson](https://github.com/bitly/go-simplejson)  
-[nsf/termbox-go](https://github.com/nsf/termbox-go)  
-[pkg/erros](https://github.com/pkg/errors)  
-[stretchr/testify/assert](https://github.com/stretchr/testify/assert)  
+`go get github.com/fiatjaf/jiq/cmd/jiq`
 
 ## Usage
 
 ### Quick start
 
 * [simple json example](#simple-json-example)  
-* [simple json example2](#simple-json-example2)  
+* [another example](#another-example)
 * [with curl](#with-curl)  
 
 #### simple json example
 
-Please execute the below command.
+execute the following command.
 
 ```
 echo '{"aa":"2AA2","bb":{"aaa":[123,"cccc",[1,2]],"c":321}}'| jiq
 ```
 
-then, jiq will be running.
+then jiq will be running.
 
 You can dig JSON data incrementally.
 
@@ -69,11 +56,11 @@ When you enter `.bb.aaa[2]`, you will see the following.
 
 Then, you press Enter key and output `[1,2]` and exit.
 
-#### simple json example2
+#### another example
 
-This json is used by [demo section](https://github.com/simeji/jiq#demo).
+This json is used by [demo section](https://github.com/fiatjaf/jiq#demo).
 ```
-echo '{"info":{"date":"2016-10-23","version":1.0},"users":[{"name":"simeji","uri":"https://github.com/simeji","id":1},{"name":"simeji2","uri":"https://example.com/simeji","id":2},{"name":"simeji3","uri":"https://example.com/simeji3","id":3}],"userCount":3}}'|jiq
+echo '{"info":{"date":"2016-10-23","version":1.0},"users":[{"name":"fiatjaf","uri":"https://github.com/fiatjaf","id":1},{"name":"fiatjaf2","uri":"https://example.com/fiatjaf","id":2},{"name":"fiatjaf3","uri":"https://example.com/fiatjaf3","id":3}],"userCount":3}}'|jiq
 ```
 
 #### with curl
