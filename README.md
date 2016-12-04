@@ -62,7 +62,7 @@ If you press Enter now it will output
 ]
 ```
 
-and exit
+and exit (if you want all the output in a single line you can either call `jiq -c` or pipe it into jq as `jiq | jq -c .`).
 
 #### advanced usage examples
 
@@ -72,7 +72,7 @@ If you have ever used jq, you'll be familiar with these:
 echo '{"economists": [{"id": 1, "name": "menger"}, {"id": 2, "name": "mises"}, {"name": "hayek", "id": 3}]}' | jiq
 ```
 
-Now try writing `.economists | "\(.[0].name), \(.[1].name) and \(.[2].name) are economists."` or `[.economists.[]].id`, or even `.economists | map({key: "\(.id)", value: .name}) | from_entries`
+Now try writing `.economists | "\(.[0].name), \(.[1].name) and \(.[2].name) are economists."` or `[.economists.[].id]`, or even `.economists | map({key: "\(.id)", value: .name}) | from_entries`
 
 #### with curl
 
@@ -82,20 +82,8 @@ Sample for using [RDAP](https://datatracker.ietf.org/wg/weirds/documents/) data.
 curl -s http://rdg.afilias.info/rdap/domain/example.info | jiq
 ```
 
-## Keymaps
+### command line arguments
 
-|key|description|
-|:-----------|:----------|
-|`TAB` / `CTRL` + `I` |Show available items and choice them|
-|`CTRL` + `W` |Delete from the cursor to the start of the word|
-|`CTRL` + `F` / Right Arrow (:arrow_right:)|To the first character of the 'Filter'|
-|`CTRL` + `B` / Left Arrow (:arrow_left:)|To the end of the 'Filter'|
-|`CTRL` + `A`|To the first character of the 'Filter'|
-|`CTRL` + `E`|To the end of the 'Filter'|
-|`CTRL` + `J`|Scroll json buffer 1 line downwards|
-|`CTRL` + `K`|Scroll json buffer 1 line upwards|
-|`CTRL` + `L`|Change view mode whole json or keys (only object)|
+-q : print the jq filter instead of the resulting filtered JSON to stdout (if you plan to use this with jq later)
 
-### Option
-
--q : Print query (for jq)
+all the [arguments jq accepts](https://stedolan.github.io/jq/manual/#Invokingjq) -- they will affect both the JSON output inside jiq and the output that is printed to stdout.
