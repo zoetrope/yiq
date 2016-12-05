@@ -11,6 +11,23 @@ import (
 func main() {
 	content := os.Stdin
 
+	if os.Args[1] == "--help" {
+		fmt.Print(`jiq - interactive commandline JSON processor
+Usage: <json string> | jiq [options] [initial filter]
+
+    jiq is a tool that allows you to play with jq filters interactively
+    acting direcly on a JSON source of your choice, given through STDIN.
+    For all the details about which filters you can use to transform your
+    JSON string, see jq(1) manpage or https://stedolan.github.io/jq
+
+    jiq supports all command line arguments jq supports, plus
+     -q         will print the ending filter to STDOUT, instead of
+                printing the resulting filtered JSON, the default.
+     --help     prints this help message.
+      `)
+		os.Exit(0)
+	}
+
 	initialquery := "."
 	outputquery := false
 	jqargs := os.Args[1:]
