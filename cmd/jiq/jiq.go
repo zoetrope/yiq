@@ -11,7 +11,7 @@ import (
 func main() {
 	content := os.Stdin
 
-	if os.Args[1] == "--help" {
+	if len(os.Args) > 1 && os.Args[1] == "--help" {
 		fmt.Print(`jiq - interactive commandline JSON processor
 Usage: <json string> | jiq [options] [initial filter]
 
