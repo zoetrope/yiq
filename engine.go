@@ -28,7 +28,7 @@ type Engine struct {
 	cursorOffsetX int
 }
 
-func NewEngine(s io.Reader, args []string) *Engine {
+func NewEngine(s io.Reader, args []string, initialquery string) *Engine {
 	j, err := ioutil.ReadAll(s)
 	if err != nil {
 		return &Engine{}
@@ -36,7 +36,7 @@ func NewEngine(s io.Reader, args []string) *Engine {
 	e := &Engine{
 		json:          string(j),
 		term:          NewTerminal(FilterPrompt, DefaultY),
-		query:         NewQuery([]rune("")),
+		query:         NewQuery([]rune(initialquery)),
 		args:          args,
 		complete:      []string{"", ""},
 		keymode:       false,
@@ -45,7 +45,7 @@ func NewEngine(s io.Reader, args []string) *Engine {
 		candidateidx:  0,
 		contentOffset: 0,
 		queryConfirm:  false,
-		cursorOffsetX: 0,
+		cursorOffsetX: len(initialquery),
 	}
 	return e
 }

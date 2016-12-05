@@ -16,15 +16,6 @@ func TestNewQuery(t *testing.T) {
 	assert.Equal(*q.complete, []rune(""))
 }
 
-func TestNewQueryWithString(t *testing.T) {
-	var assert = assert.New(t)
-
-	q := NewQueryWithString(".name")
-
-	assert.Equal(*q.query, []rune(".name"))
-	assert.Equal(*q.complete, []rune(""))
-}
-
 func TestQueryGet(t *testing.T) {
 	var assert = assert.New(t)
 

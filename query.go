@@ -18,10 +18,6 @@ func NewQuery(query []rune) *Query {
 	_ = q.Set(query)
 	return q
 }
-func NewQueryWithString(query string) *Query {
-	return NewQuery([]rune(query))
-}
-
 func (q *Query) Get() []rune {
 	return *q.query
 }

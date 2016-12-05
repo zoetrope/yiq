@@ -77,6 +77,6 @@ curl -s http://rdg.afilias.info/rdap/domain/example.info | jiq
 
 ### command line arguments
 
--q : print the jq filter instead of the resulting filtered JSON to stdout (if you plan to use this with jq later)
+`-q` : print the jq filter instead of the resulting filtered JSON to stdout (if you plan to use this with jq later)
 
-all the [arguments jq accepts](https://stedolan.github.io/jq/manual/#Invokingjq) -- they will affect both the JSON output inside jiq and the output that is printed to stdout.
+Plus all the [arguments jq accepts](https://stedolan.github.io/jq/manual/#Invokingjq) -- they will affect both the JSON output inside jiq and the output that is printed to stdout (beware that some may cause bugs).
