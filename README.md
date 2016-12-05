@@ -18,6 +18,8 @@ You can either download a binary (a single file!) from [here](https://gobuilder.
 go get github.com/fiatjaf/jiq/cmd/jiq
 ```
 
+If you don't have `jq` installed, follow instructions at https://stedolan.github.io/jq/download/ and make sure to put it in your `PATH`.
+
 ## Usage
 
 ### Quick start
