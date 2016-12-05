@@ -13,7 +13,6 @@ func TestNewQuery(t *testing.T) {
 	q := NewQuery(v)
 
 	assert.Equal(*q.query, []rune(".name"))
-	assert.Equal(*q.complete, []rune(""))
 }
 
 func TestQueryGet(t *testing.T) {

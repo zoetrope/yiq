@@ -81,11 +81,6 @@ func (t *Terminal) drawCandidates(x int, y int, index int, candidates []string) 
 
 	w, _ := termbox.Size()
 
-	// remove quotes from candidates
-	for i, quotedCand := range candidates {
-		candidates[i] = quotedCand[1 : len(quotedCand)-1]
-	}
-
 	ss := candidates[index]
 	re := regexp.MustCompile("[[:space:]]" + ss + "[[:space:]]")
 

@@ -6,14 +6,12 @@ import (
 )
 
 type Query struct {
-	query    *[]rune
-	complete *[]rune
+	query *[]rune
 }
 
 func NewQuery(query []rune) *Query {
 	q := &Query{
-		query:    &[]rune{},
-		complete: &[]rune{},
+		query: &[]rune{},
 	}
 	_ = q.Set(query)
 	return q

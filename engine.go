@@ -18,7 +18,7 @@ type Engine struct {
 	query         *Query
 	args          []string
 	term          *Terminal
-	complete      []string
+	autocomplete  string
 	candidates    []string
 	candidatemode bool
 	candidateidx  int
@@ -36,7 +36,7 @@ func NewEngine(s io.Reader, args []string, initialquery string) *Engine {
 		term:          NewTerminal(FilterPrompt, DefaultY),
 		query:         NewQuery([]rune(initialquery)),
 		args:          args,
-		complete:      []string{"", ""},
+		autocomplete:  "",
 		candidates:    []string{},
 		candidatemode: false,
 		candidateidx:  0,
@@ -62,8 +62,10 @@ func (e *Engine) Run() *EngineResult {
 	var contents []string
 
 	for {
+		e.candidates = []string{}
+		e.autocomplete = ""
 		contents = e.getContents()
-		e.setCandidates()
+		e.makeCandidates()
 		e.setCandidateData()
 
 		ta := &TerminalDrawAttributes{
@@ -72,7 +74,7 @@ func (e *Engine) Run() *EngineResult {
 			Contents:        contents,
 			CandidateIndex:  e.candidateidx,
 			ContentsOffsetY: e.contentOffset,
-			Complete:        e.complete[0],
+			Complete:        e.autocomplete,
 			Candidates:      e.candidates,
 		}
 
@@ -135,9 +137,8 @@ func (e *Engine) getContents() []string {
 	return strings.Split(cc, "\n")
 }
 
-func (e *Engine) setCandidates() {
+func (e *Engine) makeCandidates() {
 	filter := e.query.StringGet()
-	e.candidates = []string{}
 	if strings.IndexAny(strings.TrimLeft(filter, " "), "|{} @(),") == -1 {
 		// try to find suggestions since it seems to be a simple jq filter
 		validUntilNow, next := e.query.StringSplitLastKeyword()
@@ -149,11 +150,16 @@ func (e *Engine) setCandidates() {
 			candidates := strings.Split(keys[1:len(keys)-1], ",")
 			if len(candidates) > 0 && candidates[0][0] == '"' {
 				// only suggest if keys are strings
-				// filter out
 				for _, cand := range candidates {
+					// filter out candidates with the wrong prefix
 					if strings.HasPrefix(cand, `"`+next) {
-						e.candidates = append(e.candidates, cand)
+						e.candidates = append(e.candidates, cand[1:len(cand)-1] /* remove quotes */)
 					}
+				}
+
+				// if there's only one candidate, let it be our autocomplete suggestion
+				if len(e.candidates) == 1 {
+					e.autocomplete = e.candidates[0][len(next):]
 				}
 			}
 		}
@@ -161,8 +167,11 @@ func (e *Engine) setCandidates() {
 }
 
 func (e *Engine) setCandidateData() {
-	if l := len(e.candidates); e.complete[0] == "" && l > 1 {
-		if e.candidateidx >= l {
+	ncandidates := len(e.candidates)
+	if ncandidates == 1 {
+		e.candidatemode = false
+	} else if ncandidates > 1 {
+		if e.candidateidx >= ncandidates {
 			e.candidateidx = 0
 		}
 	} else {
@@ -210,13 +219,12 @@ func (e *Engine) tabAction() {
 		e.candidatemode = true
 		if e.query.StringGet() == "" {
 			_ = e.query.StringAdd(".")
-		} else if e.complete[0] != e.complete[1] && e.complete[0] != "" {
-			if k, _ := e.query.StringPopKeyword(); !strings.Contains(k, "[") {
-				_ = e.query.StringAdd(".")
+		} else if e.autocomplete != "" {
+			if _, next := e.query.StringSplitLastKeyword(); next == "" {
+				//if k, _ := e.query.StringPopKeyword(); !strings.Contains(k, "[") {
+				e.query.StringAdd(".")
 			}
-			_ = e.query.StringAdd(e.complete[1])
-		} else {
-			_ = e.query.StringAdd(e.complete[0])
+			e.query.StringAdd(e.autocomplete)
 		}
 	} else {
 		e.candidateidx = e.candidateidx + 1
