@@ -13,20 +13,9 @@ const (
 	FilterPrompt string = "[Filter]> "
 )
 
-type EngineInterface interface {
-	Run() EngineResultInterface
-	GetQuery() QueryInterface
-}
-
-type EngineResultInterface interface {
-	GetQueryString() string
-	GetContent() string
-	GetError() error
-}
-
 type Engine struct {
 	json          string
-	query         QueryInterface
+	query         *Query
 	args          []string
 	term          *Terminal
 	complete      []string
@@ -39,7 +28,7 @@ type Engine struct {
 	cursorOffsetX int
 }
 
-func NewEngine(s io.Reader, args []string) EngineInterface {
+func NewEngine(s io.Reader, args []string) *Engine {
 	j, err := ioutil.ReadAll(s)
 	if err != nil {
 		return &Engine{}
@@ -62,28 +51,12 @@ func NewEngine(s io.Reader, args []string) EngineInterface {
 }
 
 type EngineResult struct {
-	content string
-	qs      string
-	err     error
+	Content string
+	Qs      string
+	Err     error
 }
 
-func (er *EngineResult) GetQueryString() string {
-	return er.qs
-}
-
-func (er *EngineResult) GetContent() string {
-	return er.content
-}
-func (er *EngineResult) GetError() error {
-	return er.err
-}
-
-func (e *Engine) GetQuery() QueryInterface {
-	return e.query
-}
-
-func (e *Engine) Run() EngineResultInterface {
-
+func (e *Engine) Run() *EngineResult {
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
@@ -145,9 +118,9 @@ func (e *Engine) Run() EngineResultInterface {
 					cc, err := jqrun(e.query.StringGet(), e.json, e.args)
 
 					return &EngineResult{
-						content: cc,
-						qs:      e.query.StringGet(),
-						err:     err,
+						Content: cc,
+						Qs:      e.query.StringGet(),
+						Err:     err,
 					}
 				}
 				e.confirmCandidate()

@@ -25,15 +25,15 @@ func main() {
 	os.Exit(run(e, outputquery))
 }
 
-func run(e jiq.EngineInterface, outputquery bool) int {
+func run(e *jiq.Engine, outputquery bool) int {
 	result := e.Run()
-	if result.GetError() != nil {
+	if result.Err != nil {
 		return 2
 	}
 	if outputquery {
-		fmt.Printf("%s", result.GetQueryString())
+		fmt.Printf("%s", result.Qs)
 	} else {
-		fmt.Printf("%s", result.GetContent())
+		fmt.Printf("%s", result.Content)
 	}
 	return 0
 }
