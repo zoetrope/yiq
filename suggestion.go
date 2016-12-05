@@ -1,16 +1,12 @@
 package jiq
 
 import (
-	"github.com/bitly/go-simplejson"
 	"regexp"
 	"sort"
 	"strings"
-)
 
-type SuggestionInterface interface {
-	Get(json *simplejson.Json, keyword string) []string
-	GetCandidateKeys(json *simplejson.Json, keyword string) []string
-}
+	"github.com/bitly/go-simplejson"
+)
 
 type SuggestionDataType int
 
@@ -110,7 +106,6 @@ func (s *Suggestion) GetCandidateKeys(json *simplejson.Json, keyword string) []s
 }
 
 func getCurrentKeys(json *simplejson.Json) []string {
-
 	keys := []string{}
 	m, err := json.Map()
 

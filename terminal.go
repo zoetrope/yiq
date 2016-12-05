@@ -1,8 +1,9 @@
 package jiq
 
 import (
-	"github.com/nsf/termbox-go"
 	"regexp"
+
+	"github.com/nsf/termbox-go"
 )
 
 type Terminal struct {
@@ -79,6 +80,11 @@ func (t *Terminal) drawCandidates(x int, y int, index int, candidates []string) 
 	backgroundColor := termbox.ColorWhite
 
 	w, _ := termbox.Size()
+
+	// remove quotes from candidates
+	for i, quotedCand := range candidates {
+		candidates[i] = quotedCand[1 : len(quotedCand)-1]
+	}
 
 	ss := candidates[index]
 	re := regexp.MustCompile("[[:space:]]" + ss + "[[:space:]]")

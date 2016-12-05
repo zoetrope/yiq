@@ -281,3 +281,32 @@ func TestStringPopKeyword(t *testing.T) {
 	assert.Equal(query, []rune(".test.name"))
 	assert.Equal(q.Get(), []rune(".test.name"))
 }
+
+func TestStringSplitLastKeyword(t *testing.T) {
+	var assert = assert.New(t)
+
+	query := NewQuery([]rune(""))
+	valid, next := query.StringSplitLastKeyword()
+	assert.Equal("", valid)
+	assert.Equal("", next)
+
+	query = NewQuery([]rune("."))
+	valid, next = query.StringSplitLastKeyword()
+	assert.Equal("", valid)
+	assert.Equal("", next)
+
+	query = NewQuery([]rune(".test.name[23]"))
+	valid, next = query.StringSplitLastKeyword()
+	assert.Equal(".test.name[23]", valid)
+	assert.Equal("", next)
+
+	query = NewQuery([]rune(".banana.bo"))
+	valid, next = query.StringSplitLastKeyword()
+	assert.Equal(".banana", valid)
+	assert.Equal("bo", next)
+
+	query = NewQuery([]rune(".banana.boat[23].marshmal"))
+	valid, next = query.StringSplitLastKeyword()
+	assert.Equal(".banana.boat[23]", valid)
+	assert.Equal("marshmal", next)
+}

@@ -19,12 +19,10 @@ type Engine struct {
 	args          []string
 	term          *Terminal
 	complete      []string
-	keymode       bool
 	candidates    []string
 	candidatemode bool
 	candidateidx  int
 	contentOffset int
-	queryConfirm  bool
 	cursorOffsetX int
 }
 
@@ -39,12 +37,10 @@ func NewEngine(s io.Reader, args []string, initialquery string) *Engine {
 		query:         NewQuery([]rune(initialquery)),
 		args:          args,
 		complete:      []string{"", ""},
-		keymode:       false,
 		candidates:    []string{},
 		candidatemode: false,
 		candidateidx:  0,
 		contentOffset: 0,
-		queryConfirm:  false,
 		cursorOffsetX: len(initialquery),
 	}
 	return e
@@ -67,8 +63,8 @@ func (e *Engine) Run() *EngineResult {
 
 	for {
 		contents = e.getContents()
+		e.setCandidates()
 		e.setCandidateData()
-		e.queryConfirm = false
 
 		ta := &TerminalDrawAttributes{
 			Query:           e.query.StringGet(),
@@ -107,12 +103,10 @@ func (e *Engine) Run() *EngineResult {
 				e.scrollToAbove()
 			case termbox.KeyCtrlJ, termbox.KeyPgdn:
 				e.scrollToBelow()
-			case termbox.KeyCtrlL:
-				e.toggleKeymode()
 			case termbox.KeyCtrlW:
 				e.deleteWordBackward()
 			case termbox.KeyEsc:
-				e.escapeCandidateMode()
+				e.candidatemode = false
 			case termbox.KeyEnter:
 				if !e.candidatemode {
 					cc, err := jqrun(e.query.StringGet(), e.json, e.args)
@@ -137,16 +131,33 @@ func (e *Engine) Run() *EngineResult {
 }
 
 func (e *Engine) getContents() []string {
-	var contents []string
-
 	cc, _ := jqrun(e.query.StringGet(), e.json, e.args)
+	return strings.Split(cc, "\n")
+}
 
-	if e.keymode {
-		contents = e.candidates
-	} else {
-		contents = strings.Split(cc, "\n")
+func (e *Engine) setCandidates() {
+	filter := e.query.StringGet()
+	e.candidates = []string{}
+	if strings.IndexAny(strings.TrimLeft(filter, " "), "|{} @(),") == -1 {
+		// try to find suggestions since it seems to be a simple jq filter
+		validUntilNow, next := e.query.StringSplitLastKeyword()
+		if validUntilNow == "" {
+			validUntilNow = "."
+		}
+		keys, err := jqrun(validUntilNow+" | keys", e.json, []string{"-c"})
+		if err == nil {
+			candidates := strings.Split(keys[1:len(keys)-1], ",")
+			if len(candidates) > 0 && candidates[0][0] == '"' {
+				// only suggest if keys are strings
+				// filter out
+				for _, cand := range candidates {
+					if strings.HasPrefix(cand, `"`+next) {
+						e.candidates = append(e.candidates, cand)
+					}
+				}
+			}
+		}
 	}
-	return contents
 }
 
 func (e *Engine) setCandidateData() {
@@ -164,11 +175,11 @@ func (e *Engine) setCandidateData() {
 }
 
 func (e *Engine) confirmCandidate() {
-	_, _ = e.query.PopKeyword()
-	_ = e.query.StringAdd(".")
-	q := e.query.StringAdd(e.candidates[e.candidateidx])
-	e.cursorOffsetX = len(q)
-	e.queryConfirm = true
+	filter, _ := e.query.StringSplitLastKeyword()
+	filter += "." + e.candidates[e.candidateidx]
+	e.query.StringSet(filter)
+	e.cursorOffsetX = len(filter)
+	e.candidatemode = false
 }
 
 func (e *Engine) deleteChar() {
@@ -187,9 +198,6 @@ func (e *Engine) scrollToAbove() {
 	if o := e.contentOffset - 1; o >= 0 {
 		e.contentOffset = o
 	}
-}
-func (e *Engine) toggleKeymode() {
-	e.keymode = !e.keymode
 }
 func (e *Engine) deleteWordBackward() {
 	if k, _ := e.query.StringPopKeyword(); k != "" && !strings.Contains(k, "[") {
@@ -214,9 +222,6 @@ func (e *Engine) tabAction() {
 		e.candidateidx = e.candidateidx + 1
 	}
 	e.cursorOffsetX = len(e.query.Get())
-}
-func (e *Engine) escapeCandidateMode() {
-	e.candidatemode = false
 }
 func (e *Engine) inputChar(ch rune) {
 	b := len(e.query.Get())

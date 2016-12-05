@@ -160,3 +160,18 @@ func (q *Query) StringPopKeyword() (string, []rune) {
 	keyword, query := q.PopKeyword()
 	return string(keyword), query
 }
+
+func (q *Query) StringSplitLastKeyword() (string, string) {
+	filter := q.StringGet()
+	last := strings.LastIndexAny(filter, "].")
+	if last == -1 {
+		return strings.TrimSpace(filter), ""
+	}
+	switch filter[last] {
+	case '.':
+		return filter[:last], filter[last+1:]
+	case ']':
+		return filter[:last+1], filter[last+1:]
+	}
+	return filter, ""
+}
