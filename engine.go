@@ -95,17 +95,17 @@ func (e *Engine) Run() *EngineResult {
 				e.deleteNextChar()
 			case termbox.KeyTab:
 				e.tabAction()
-			case termbox.KeyArrowLeft, termbox.KeyCtrlB:
+			case termbox.KeyArrowLeft:
 				e.moveCursorBackward()
-			case termbox.KeyArrowRight, termbox.KeyCtrlF:
+			case termbox.KeyArrowRight:
 				e.moveCursorForward()
 			case termbox.KeyHome, termbox.KeyCtrlA:
 				e.moveCursorToTop()
-			case termbox.KeyEnd, termbox.KeyCtrlE:
+			case termbox.KeyEnd:
 				e.moveCursorToEnd()
-			case termbox.KeyCtrlK:
+			case termbox.KeyCtrlK, termbox.KeyPgup:
 				e.scrollToAbove()
-			case termbox.KeyCtrlJ:
+			case termbox.KeyCtrlJ, termbox.KeyPgdn:
 				e.scrollToBelow()
 			case termbox.KeyCtrlL:
 				e.toggleKeymode()
