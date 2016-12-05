@@ -218,18 +218,17 @@ func (e *Engine) tabAction() {
 	if !e.candidatemode {
 		e.candidatemode = true
 		if e.query.StringGet() == "" {
-			_ = e.query.StringAdd(".")
+			e.query.StringAdd(".")
+			e.cursorOffsetX = 1
 		} else if e.autocomplete != "" {
-			if _, next := e.query.StringSplitLastKeyword(); next == "" {
-				//if k, _ := e.query.StringPopKeyword(); !strings.Contains(k, "[") {
-				e.query.StringAdd(".")
-			}
-			e.query.StringAdd(e.autocomplete)
+			valid, next := e.query.StringSplitLastKeyword()
+			filter := valid + "." + next + e.autocomplete
+			e.query.StringSet(filter)
+			e.cursorOffsetX = len(filter)
 		}
 	} else {
 		e.candidateidx = e.candidateidx + 1
 	}
-	e.cursorOffsetX = len(e.query.Get())
 }
 func (e *Engine) inputChar(ch rune) {
 	b := len(e.query.Get())
