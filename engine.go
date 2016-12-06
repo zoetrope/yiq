@@ -3,6 +3,7 @@ package jiq
 import (
 	"io"
 	"io/ioutil"
+	"regexp"
 	"strings"
 
 	"github.com/nsf/termbox-go"
@@ -137,6 +138,8 @@ func (e *Engine) getContents() []string {
 	return strings.Split(cc, "\n")
 }
 
+var complicatedKeyRegex = regexp.MustCompile(`\d|\W`)
+
 func (e *Engine) makeCandidates() {
 	filter := e.query.StringGet()
 	if strings.IndexAny(strings.TrimLeft(filter, " "), "|{} @(),") == -1 {
@@ -153,7 +156,12 @@ func (e *Engine) makeCandidates() {
 				for _, cand := range candidates {
 					// filter out candidates with the wrong prefix
 					if strings.HasPrefix(cand, `"`+next) {
-						e.candidates = append(e.candidates, cand[1:len(cand)-1] /* remove quotes */)
+						cand = cand[1 : len(cand)-1] // remove quotes
+						if complicatedKeyRegex.FindStringIndex(cand) != nil {
+							// superquote ["<value>"] complicated keys
+							cand = `["` + cand + `"]`
+						}
+						e.candidates = append(e.candidates, cand)
 					}
 				}
 
@@ -185,7 +193,10 @@ func (e *Engine) setCandidateData() {
 
 func (e *Engine) confirmCandidate() {
 	filter, _ := e.query.StringSplitLastKeyword()
-	filter += "." + e.candidates[e.candidateidx]
+	if e.candidates[e.candidateidx][0] != '[' {
+		filter += "."
+	}
+	filter += e.candidates[e.candidateidx]
 	e.query.StringSet(filter)
 	e.cursorOffsetX = len(filter)
 	e.candidatemode = false

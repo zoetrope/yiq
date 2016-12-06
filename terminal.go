@@ -1,7 +1,7 @@
 package jiq
 
 import (
-	"regexp"
+	"strings"
 
 	"github.com/nsf/termbox-go"
 )
@@ -82,7 +82,7 @@ func (t *Terminal) drawCandidates(x int, y int, index int, candidates []string) 
 	w, _ := termbox.Size()
 
 	ss := candidates[index]
-	re := regexp.MustCompile("[[:space:]]" + ss + "[[:space:]]")
+	nss := len(ss)
 
 	var rows []string
 	var str string
@@ -97,12 +97,12 @@ func (t *Terminal) drawCandidates(x int, y int, index int, candidates []string) 
 	rows = append(rows, str+" ")
 
 	for i, row := range rows {
-		match := re.FindStringIndex(row)
+		match := strings.Index(row, ss)
 		var c termbox.Attribute
 		for ii, s := range row {
 			c = color
 			backgroundColor = termbox.ColorMagenta
-			if match != nil && ii >= match[0]+1 && ii < match[1]-1 {
+			if match != -1 && ii >= match && ii < match+nss {
 				backgroundColor = termbox.ColorWhite
 			}
 			termbox.SetCell(x+ii, y+i, s, c, backgroundColor)
