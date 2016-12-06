@@ -1,0 +1,4 @@
+---
+readme_file: README.md
+triggers:
+  - github.com/fiatjaf/jiq/cmd/jiq
