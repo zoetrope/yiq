@@ -25,6 +25,3 @@ _testmain.go
 *.swp
 *.test
 test.*
-
-# jiq package
-*.out

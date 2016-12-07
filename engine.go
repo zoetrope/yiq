@@ -59,6 +59,7 @@ func (e *Engine) Run() *EngineResult {
 		panic(err)
 	}
 	defer termbox.Close()
+	termbox.SetInputMode(termbox.InputAlt)
 
 	var contents []string
 
@@ -85,29 +86,69 @@ func (e *Engine) Run() *EngineResult {
 		case termbox.EventKey:
 			switch ev.Key {
 			case 0:
-				e.inputChar(ev.Ch)
+				if ev.Mod == termbox.ModAlt { // alt+something key shortcuts
+					switch ev.Ch {
+					case 'f':
+						// move one word forward
+						filter := e.query.StringGet()
+						if len(filter) > e.cursorOffsetX {
+							n := strings.IndexAny(filter[e.cursorOffsetX:], "[.")
+							if n == -1 {
+								e.cursorOffsetX = len(filter)
+							} else {
+								e.cursorOffsetX += n + 1
+							}
+						}
+					case 'b':
+						// move one word backwards
+						filter := e.query.StringGet()
+						if 0 < e.cursorOffsetX {
+							n := strings.LastIndexAny(filter[:e.cursorOffsetX], "[.")
+							if n == -1 {
+								e.cursorOffsetX = 0
+							} else {
+								e.cursorOffsetX = n
+							}
+						}
+					}
+				} else {
+					e.inputChar(ev.Ch)
+				}
 			case termbox.KeySpace:
 				e.inputChar(32)
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
-				e.deleteChar()
+				// delete previous char
+				if e.cursorOffsetX > 0 {
+					_ = e.query.Delete(e.cursorOffsetX - 1)
+					e.cursorOffsetX -= 1
+				}
 			case termbox.KeyDelete:
-				e.deleteNextChar()
+				e.query.Delete(e.cursorOffsetX) // delete next char
+			case termbox.KeyCtrlU:
+				e.query.Clear()
 			case termbox.KeyTab:
 				e.tabAction()
 			case termbox.KeyArrowLeft:
-				e.moveCursorBackward()
+				// move cursor left
+				if e.cursorOffsetX > 0 {
+					e.cursorOffsetX -= 1
+				}
 			case termbox.KeyArrowRight:
-				e.moveCursorForward()
-			case termbox.KeyHome, termbox.KeyCtrlA:
-				e.moveCursorToTop()
-			case termbox.KeyEnd:
-				e.moveCursorToEnd()
+				// move cursor right
+				if len(e.query.Get()) > e.cursorOffsetX {
+					e.cursorOffsetX += 1
+				}
+			case termbox.KeyHome, termbox.KeyCtrlA: // move to start of line
+				e.cursorOffsetX = 0
+			case termbox.KeyEnd, termbox.KeyCtrlE, termbox.KeyArrowDown: // move to end of line
+				e.cursorOffsetX = len(e.query.Get())
+			case termbox.KeyCtrlW:
+				// delete the word before the cursor
+				e.deleteWordBackward()
 			case termbox.KeyCtrlK, termbox.KeyPgup:
 				e.scrollToAbove()
 			case termbox.KeyCtrlJ, termbox.KeyPgdn:
 				e.scrollToBelow()
-			case termbox.KeyCtrlW:
-				e.deleteWordBackward()
 			case termbox.KeyEsc:
 				e.candidatemode = false
 			case termbox.KeyEnter:
@@ -202,15 +243,6 @@ func (e *Engine) confirmCandidate() {
 	e.candidatemode = false
 }
 
-func (e *Engine) deleteChar() {
-	if e.cursorOffsetX > 0 {
-		_ = e.query.Delete(e.cursorOffsetX - 1)
-		e.cursorOffsetX -= 1
-	}
-}
-func (e *Engine) deleteNextChar() {
-	e.query.Delete(e.cursorOffsetX)
-}
 func (e *Engine) scrollToBelow() {
 	e.contentOffset++
 }
@@ -247,25 +279,4 @@ func (e *Engine) inputChar(ch rune) {
 	if b < len(q) {
 		e.cursorOffsetX += 1
 	}
-}
-
-func (e *Engine) moveCursorBackward() {
-	if e.cursorOffsetX > 0 {
-		e.cursorOffsetX -= 1
-	}
-}
-func (e *Engine) moveCursorForward() {
-	if len(e.query.Get()) > e.cursorOffsetX {
-		e.cursorOffsetX += 1
-	}
-}
-func (e *Engine) moveCursorWordBackwark() {
-}
-func (e *Engine) moveCursorWordForward() {
-}
-func (e *Engine) moveCursorToTop() {
-	e.cursorOffsetX = 0
-}
-func (e *Engine) moveCursorToEnd() {
-	e.cursorOffsetX = len(e.query.Get())
 }
