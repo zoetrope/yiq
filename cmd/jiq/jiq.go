@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/fiatjaf/jiq"
@@ -39,7 +38,6 @@ Usage: <json string> | jiq [options] [initial filter]
 			jqargs = append(jqargs, os.Args[i+1:]...)
 			break
 		} else if arg[0] != '-' {
-			log.Print(i, " ", arg)
 			initialquery = arg
 			jqargs = os.Args[1:i]
 			jqargs = append(jqargs, os.Args[i+1:]...)
