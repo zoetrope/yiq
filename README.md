@@ -8,7 +8,9 @@ jiq uses [jq](https://stedolan.github.io/jq/) internally, and it **requires** yo
 
 ## Demo
 
-![demo-jiq-main](https://github.com/simeji/jid/wiki/images/demo-jid-main-640.gif)
+![screencast-repo.gif](screencast-repo.gif)
+
+![screencast-packagejson.gif](screencast-packagejson.gif)
 
 ## Installation
 
