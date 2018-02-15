@@ -1,10 +1,12 @@
-# jiq
+# jiq [![Mentioned in Awesome jq](https://awesome.re/mentioned-badge.svg)](https://github.com/fiatjaf/awesome-jq)
 
 It's [jid](https://github.com/simeji/jid) with [jq](https://stedolan.github.io/jq/).
 
 You can drill down interactively by using [jq](https://stedolan.github.io/jq/) filtering queries.
 
 jiq uses [jq](https://stedolan.github.io/jq/) internally, and it **requires** you to have `jq` in your `PATH`.
+
+If you prefer, there's an experimental, standalone, purely client-side web version of this on https://jq.alhur.es/jiq/.
 
 ## Demo
 
