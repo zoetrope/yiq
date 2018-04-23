@@ -16,8 +16,6 @@ If you prefer, there's an experimental, standalone, purely client-side web versi
 
 ## Installation
 
-You can either download a binary (a single file!) from [here](https://gobuilder.me/github.com/fiatjaf/jiq/cmd/jiq) or build `jiq` command by yourself with `go get`:
-
 ```
 go get github.com/fiatjaf/jiq/cmd/jiq
 ```
