@@ -41,10 +41,12 @@ func TestjiqRunWithError(t *testing.T) {
 	assert.Equal(0, called)
 }
 
-func (e *EngineMock) Run() jiq.EngineResultInterface {
+type EngineMock struct{ err error }
+
+func (e *EngineMock) Run() *jiq.EngineResult {
 	return &jiq.EngineResult{
-		err:     fmt.Errorf(""),
-		qs:      ".querystring",
-		content: `{"test": "result"}`,
+		Err:     fmt.Errorf(""),
+		Qs:      ".querystring",
+		Content: `{"test": "result"}`,
 	}
 }
