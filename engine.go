@@ -140,15 +140,21 @@ func (e *Engine) Run() *EngineResult {
 				}
 			case termbox.KeyHome, termbox.KeyCtrlA: // move to start of line
 				e.cursorOffsetX = 0
-			case termbox.KeyEnd, termbox.KeyCtrlE, termbox.KeyArrowDown: // move to end of line
+			case termbox.KeyEnd, termbox.KeyCtrlE: // move to end of line
 				e.cursorOffsetX = len(e.query.Get())
 			case termbox.KeyCtrlW:
 				// delete the word before the cursor
 				e.deleteWordBackward()
-			case termbox.KeyCtrlK, termbox.KeyPgup:
+			case termbox.KeyCtrlK, termbox.KeyArrowUp:
 				e.scrollToAbove()
-			case termbox.KeyCtrlJ, termbox.KeyPgdn:
+			case termbox.KeyCtrlJ, termbox.KeyArrowDown:
 				e.scrollToBelow()
+            case termbox.KeyCtrlN, termbox.KeyPgdn:
+                _, h := termbox.Size()
+                e.scrollPageDown(len(contents), h)
+            case termbox.KeyCtrlP, termbox.KeyPgup:
+                _, h := termbox.Size()
+                e.scrollPageUp(h)
 			case termbox.KeyEsc:
 				e.candidatemode = false
 			case termbox.KeyEnter:
@@ -250,6 +256,20 @@ func (e *Engine) scrollToAbove() {
 	if o := e.contentOffset - 1; o >= 0 {
 		e.contentOffset = o
 	}
+}
+func (e *Engine) scrollPageDown(rownum int, height int) {
+    co := rownum - 1
+    if o := rownum - e.contentOffset; o > height {
+        co = e.contentOffset + (height - DefaultY)
+    }
+    e.contentOffset = co
+}
+func (e *Engine) scrollPageUp(height int) {
+    co := 0
+    if o := e.contentOffset - (height - DefaultY); o > 0 {
+		co = o
+	}
+	e.contentOffset = co
 }
 func (e *Engine) deleteWordBackward() {
 	if k, _ := e.query.StringPopKeyword(); k != "" && !strings.Contains(k, "[") {

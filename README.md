@@ -26,9 +26,9 @@ If you don't have `jq` installed, follow instructions at https://stedolan.github
 
 ### Quick start
 
-* [simple example](#simple-example)  
+* [simple example](#simple-example)
 * [advanced usage examples](#advanced-usage-examples)
-* [with curl](#with-curl)  
+* [with curl](#with-curl)
 
 #### simple example
 
@@ -90,3 +90,24 @@ Plus all the [arguments jq accepts](https://stedolan.github.io/jq/manual/#Invoki
 traffic analytics for this repo:
 
 [![](https://ght.trackingco.de/fiatjaf/jiq)](https://ght.trackingco.de/)
+
+## Keymaps
+|key|description|
+|:-----------|:------------|
+|`TAB` / `CTRL` + `I` |Show available items and choice them|
+|`CTRL` + `W` |Delete from the cursor to the start of the word|
+|`CTRL` + `U` |Delete whole query|
+|`CTRL` + `F` / Right Arrow (:arrow_right:)|Move cursor a character to the right|
+|`ALT` + `F` |Move one word forward|
+|`CTRL` + `B` / Left Arrow (:arrow_left:)|Move cursor a character to the left|
+|`ALT` + `B` |Move one word backward|
+|`CTRL` + `A` / Home|To the first character of the 'Filter'|
+|`CTRL` + `E`/ End|To the end of the 'Filter'|
+|`CTRL` + `J` / Down Arrow (:arrow_down:)|Scroll json buffer 1 line downwards|
+|`CTRL` + `K` / Up Arrow (:arrow_up:)|Scroll json buffer 1 line upwards|
+|`CTRL` + `G`|Scroll json buffer to bottom|
+|`CTRL` + `T`|Scroll json buffer to top|
+|`CTRL` + `N` / PageDown|Scroll json buffer 'Page Down'|
+|`CTRL` + `P` / PageUp|Scroll json buffer 'Page Up'|
+|`ESC`|Hide a candidate box|
+
