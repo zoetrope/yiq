@@ -20,7 +20,6 @@ func jqrun(query string, json string, opts []string) (res string, err error) {
 	opts = append(opts, query)
 	cmd := exec.Command("jq", opts...)
 	cmd.Stdin = bytes.NewBufferString(json)
-	cmd.Env = make([]string, 0)
 	cmd.Stdout = &b
 	cmd.Stderr = &b
 	err = cmd.Start()

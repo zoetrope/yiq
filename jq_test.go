@@ -1,6 +1,9 @@
 package jiq
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,4 +29,28 @@ func TestJqQueries(t *testing.T) {
 
 	res, _ = jqrun(".a", `{"a": [{"w": 18}, {"w": false}]}`, []string{"-c"})
 	assert.Equal(`[{"w":18},{"w":false}]`, res)
+}
+
+func TestJqModules(t *testing.T) {
+	var assert = assert.New(t)
+
+	dir, err := ioutil.TempDir("", "")
+	if !assert.NoError(err, "error creating tempdir") {
+		return
+	}
+
+	defer os.RemoveAll(dir)
+
+	content := []byte(`def hello(f): f ;`)
+
+	err = ioutil.WriteFile(filepath.Join(dir, ".jq"), content, 0666)
+	if !assert.NoError(err, "error creating tempfile") {
+		return
+	}
+
+	defer os.Setenv("HOME", os.Getenv("HOME"))
+	os.Setenv("HOME", dir)
+
+	res, _ := jqrun("hello(.hi)", `{"hi": "world"}`, nil)
+	assert.Equal(`"world"`, res)
 }
