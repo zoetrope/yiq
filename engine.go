@@ -11,7 +11,7 @@ import (
 
 const (
 	DefaultY     int    = 1
-	FilterPrompt string = "[Filter]> "
+	FilterPrompt string = "[jq]> "
 )
 
 type Engine struct {
@@ -149,12 +149,12 @@ func (e *Engine) Run() *EngineResult {
 				e.scrollToAbove()
 			case termbox.KeyCtrlJ, termbox.KeyArrowDown:
 				e.scrollToBelow()
-            case termbox.KeyCtrlN, termbox.KeyPgdn:
-                _, h := termbox.Size()
-                e.scrollPageDown(len(contents), h)
-            case termbox.KeyCtrlP, termbox.KeyPgup:
-                _, h := termbox.Size()
-                e.scrollPageUp(h)
+			case termbox.KeyCtrlN, termbox.KeyPgdn:
+				_, h := termbox.Size()
+				e.scrollPageDown(len(contents), h)
+			case termbox.KeyCtrlP, termbox.KeyPgup:
+				_, h := termbox.Size()
+				e.scrollPageUp(h)
 			case termbox.KeyEsc:
 				e.candidatemode = false
 			case termbox.KeyEnter:
@@ -198,7 +198,7 @@ func (e *Engine) makeCandidates() {
 		keys, err := jqrun(validUntilNow+" | keys", e.json, []string{"-c"})
 		if err == nil {
 			candidates := strings.Split(keys[1:len(keys)-1], ",")
-			if len(candidates) > 0 && candidates[0][0] == '"' {
+			if len(candidates[0]) > 0 && candidates[0][0] == '"' {
 				// only suggest if keys are strings
 				for _, cand := range candidates {
 					// filter out candidates with the wrong prefix
@@ -258,15 +258,15 @@ func (e *Engine) scrollToAbove() {
 	}
 }
 func (e *Engine) scrollPageDown(rownum int, height int) {
-    co := rownum - 1
-    if o := rownum - e.contentOffset; o > height {
-        co = e.contentOffset + (height - DefaultY)
-    }
-    e.contentOffset = co
+	co := rownum - 1
+	if o := rownum - e.contentOffset; o > height {
+		co = e.contentOffset + (height - DefaultY)
+	}
+	e.contentOffset = co
 }
 func (e *Engine) scrollPageUp(height int) {
-    co := 0
-    if o := e.contentOffset - (height - DefaultY); o > 0 {
+	co := 0
+	if o := e.contentOffset - (height - DefaultY); o > 0 {
 		co = o
 	}
 	e.contentOffset = co

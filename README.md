@@ -43,7 +43,7 @@ Then jiq will be running. Now you can dig JSON data incrementally.
 When you enter `.bb.aaa[2]`, you will see the following.
 
 ```
-[Filter]> .bb.aaa[2]
+[jq]> .bb.aaa[2]
 [
   1,
   2
@@ -110,4 +110,3 @@ traffic analytics for this repo:
 |`CTRL` + `N` / PageDown|Scroll json buffer 'Page Down'|
 |`CTRL` + `P` / PageUp|Scroll json buffer 'Page Up'|
 |`ESC`|Hide a candidate box|
-
