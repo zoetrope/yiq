@@ -61,12 +61,12 @@ func (e *Engine) Run() *EngineResult {
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputAlt)
 
-	var contents []string
+	var contents []string = []string{""}
 
 	for {
 		e.candidates = []string{}
 		e.autocomplete = ""
-		contents = e.getContents()
+		contents = e.getContents(contents)
 		e.makeCandidates()
 		e.setCandidateData()
 
@@ -180,9 +180,16 @@ func (e *Engine) Run() *EngineResult {
 	}
 }
 
-func (e *Engine) getContents() []string {
-	cc, _ := jqrun(e.query.StringGet(), e.json, e.args)
-	return strings.Split(cc, "\n")
+func (e *Engine) getContents(prevContents []string) []string {
+	cc, err := jqrun(e.query.StringGet(), e.json, e.args)
+	if err == nil {
+		return strings.Split("\n"+cc, "\n")
+	} else {
+		return append(
+			strings.Split(cc[0:strings.Index(cc, "\n")], "\n"),
+			prevContents[1:]...,
+		)
+	}
 }
 
 var complicatedKeyRegex = regexp.MustCompile(`\d|\W`)
