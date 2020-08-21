@@ -10,9 +10,7 @@ If you prefer, there's an experimental, standalone, purely client-side web versi
 
 ## Demo
 
-![screencast-repo.gif](screencast-repo.gif)
-
-![screencast-packagejson.gif](screencast-packagejson.gif)
+![screencast.gif](screencast.gif)
 
 ## Installation
 
