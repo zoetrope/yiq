@@ -185,8 +185,13 @@ func (e *Engine) getContents(prevContents []string) []string {
 	if err == nil {
 		return strings.Split("\n"+cc, "\n")
 	} else {
+		errorline := []string{cc}
+		if newline := strings.Index(cc, "\n"); newline != -1 {
+			errorline = []string{cc[0:newline]}
+		}
+
 		return append(
-			strings.Split(cc[0:strings.Index(cc, "\n")], "\n"),
+			errorline,
 			prevContents[1:]...,
 		)
 	}
