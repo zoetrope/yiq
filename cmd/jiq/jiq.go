@@ -7,9 +7,15 @@ import (
 	"github.com/fiatjaf/jiq"
 )
 
+var version string
+
 func main() {
 	content := os.Stdin
 
+	if len(os.Args) > 1 && os.Args[1] == "--version" {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 	if len(os.Args) > 1 && os.Args[1] == "--help" {
 		fmt.Print(`jiq - interactive commandline JSON processor
 Usage: <json string> | jiq [options] [initial filter]
