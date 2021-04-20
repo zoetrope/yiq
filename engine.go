@@ -1,17 +1,18 @@
-package jiq
+package yiq
 
 import (
 	"io"
 	"io/ioutil"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/nsf/termbox-go"
 )
 
 const (
 	DefaultY     int    = 1
-	FilterPrompt string = "[jq]> "
+	FilterPrompt string = "[yq]> "
 )
 
 type Engine struct {
@@ -64,12 +65,25 @@ func (e *Engine) Run() *EngineResult {
 	var contents []string = []string{""}
 
 	for {
-		e.candidates = []string{}
-		e.autocomplete = ""
-		contents = e.getContents(contents)
-		e.makeCandidates()
-		e.setCandidateData()
+		t := time.AfterFunc(100*time.Millisecond, func() {
+			e.candidates = []string{}
+			e.autocomplete = ""
+			contents = e.getContents(contents)
+			e.makeCandidates()
+			e.setCandidateData()
 
+			ta := &TerminalDrawAttributes{
+				Query:           e.query.StringGet(),
+				CursorOffsetX:   e.cursorOffsetX,
+				Contents:        contents,
+				CandidateIndex:  e.candidateidx,
+				ContentsOffsetY: e.contentOffset,
+				Complete:        e.autocomplete,
+				Candidates:      e.candidates,
+			}
+
+			e.term.draw(ta)
+		})
 		ta := &TerminalDrawAttributes{
 			Query:           e.query.StringGet(),
 			CursorOffsetX:   e.cursorOffsetX,
@@ -81,7 +95,6 @@ func (e *Engine) Run() *EngineResult {
 		}
 
 		e.term.draw(ta)
-
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
 			switch ev.Key {
@@ -159,7 +172,7 @@ func (e *Engine) Run() *EngineResult {
 				e.candidatemode = false
 			case termbox.KeyEnter:
 				if !e.candidatemode {
-					cc, err := jqrun(e.query.StringGet(), e.json, e.args)
+					cc, err := yqrun(e.query.StringGet(), e.json, e.args)
 
 					return &EngineResult{
 						Content: cc,
@@ -177,11 +190,12 @@ func (e *Engine) Run() *EngineResult {
 			break
 		default:
 		}
+		t.Stop()
 	}
 }
 
 func (e *Engine) getContents(prevContents []string) []string {
-	cc, err := jqrun(e.query.StringGet(), e.json, e.args)
+	cc, err := yqrun(e.query.StringGet(), e.json, e.args)
 	if err == nil {
 		return strings.Split("\n"+cc, "\n")
 	} else {
@@ -207,7 +221,7 @@ func (e *Engine) makeCandidates() {
 		if validUntilNow == "" {
 			validUntilNow = "."
 		}
-		keys, err := jqrun(validUntilNow+" | keys", e.json, []string{"-c"})
+		keys, err := yqrun(validUntilNow+" | keys", e.json, []string{"-c"})
 		if err == nil {
 			candidates := strings.Split(keys[1:len(keys)-1], ",")
 			if len(candidates[0]) > 0 && candidates[0][0] == '"' {

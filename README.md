@@ -1,112 +1,57 @@
-# jiq [![Mentioned in Awesome jq](https://awesome.re/mentioned-badge.svg)](https://github.com/fiatjaf/awesome-jq)
+# yiq
 
-It's [jid](https://github.com/simeji/jid) with [jq](https://stedolan.github.io/jq/).
+It's [jiq](https://github.com/fiatjaf/jiq) with [yq](https://github.com/mikefarah/yq).
 
-You can drill down interactively by using [jq](https://stedolan.github.io/jq/) filtering queries.
+You can drill down interactively by using [yq](https://github.com/mikefarah/yq) filtering queries.
 
-jiq uses [jq](https://stedolan.github.io/jq/) internally, and it **requires** you to have `jq` in your `PATH`.
-
-If you prefer, there's an experimental, standalone, purely client-side web version of this on https://jq.alhur.es/jiq/.
+yiq uses [yq](https://github.com/mikefarah/yq) internally, and it **requires** you to have `yq` in your `PATH`.
 
 ## Demo
 
-![screencast.gif](screencast.gif)
+T.B.D.
 
 ## Installation
 
 Either [prebuilt binary for your system](https://github.com/fiatjaf/jiq/releases) (and make sure to `chmod +x` it first) or install/compile with Go:
 
 ```
-go get github.com/fiatjaf/jiq/cmd/jiq
+go get github.com/zoetrope/yiq/cmd/yiq
 ```
 
-If you don't have `jq` installed, follow instructions at https://stedolan.github.io/jq/download/ and make sure to put it in your `PATH`.
+If you don't have `yq` installed, follow instructions at https://github.com/mikefarah/yq/releases and make sure to put it in your `PATH`.
 
 ## Usage
 
 ### Quick start
 
 * [simple example](#simple-example)
-* [advanced usage examples](#advanced-usage-examples)
-* [with curl](#with-curl)
 
 #### simple example
 
-Execute the following command:
-
 ```
-echo '{"aa":"2AA2","bb":{"aaa":[123,"cccc",[1,2]],"c":321}}'| jiq
-```
-
-Then jiq will be running. Now you can dig JSON data incrementally.
-
-When you enter `.bb.aaa[2]`, you will see the following.
-
-```
-[jq]> .bb.aaa[2]
-[
-  1,
-  2
-]
-```
-
-If you press Enter now it will output
-
-```json
-[
-  1,
-  2
-]
+cat > sample.yaml <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample
+  labels:
+    app: ubuntu
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:18.04
+EOF
 ```
 
-and exit (if you want all the output in a single line you can either call `jiq -c` or pipe it into jq as `jiq | jq -c .`).
-
-#### advanced usage examples
-
-If you have ever used jq, you'll be familiar with these:
-
 ```
-echo '{"economists": [{"id": 1, "name": "menger"}, {"id": 2, "name": "mises"}, {"name": "hayek", "id": 3}]}' | jiq
+cat sample.yaml | yiq
 ```
-
-Now try writing `.economists | "\(.[0].name), \(.[1].name) and \(.[2].name) are economists."` or `[.economists.[].id]`, or even `.economists | map({key: "\(.id)", value: .name}) | from_entries`
-
-#### with curl
-
-Sample for using [RDAP](https://datatracker.ietf.org/wg/weirds/documents/) data.
-
-```
-curl -s http://rdg.afilias.info/rdap/domain/example.info | jiq
-```
-
-### command line arguments
-
-`-q` : print the jq filter instead of the resulting filtered JSON to stdout (if you plan to use this with jq later)
-
-Plus all the [arguments jq accepts](https://stedolan.github.io/jq/manual/#Invokingjq) -- they will affect both the JSON output inside jiq and the output that is printed to stdout (beware that some may cause bugs).
-
----
-
-traffic analytics for this repo:
-
-[![](https://ght.trackingco.de/fiatjaf/jiq)](https://ght.trackingco.de/)
-
-## Keymaps
-|key|description|
-|:-----------|:------------|
-|`TAB` / `CTRL` + `I` |Show available items and choice them|
-|`CTRL` + `W` |Delete from the cursor to the start of the word|
-|`CTRL` + `U` |Delete whole query|
-|`CTRL` + `F` / Right Arrow (:arrow_right:)|Move cursor a character to the right|
-|`ALT` + `F` |Move one word forward|
-|`CTRL` + `B` / Left Arrow (:arrow_left:)|Move cursor a character to the left|
-|`ALT` + `B` |Move one word backward|
-|`CTRL` + `A` / Home|To the first character of the 'Filter'|
-|`CTRL` + `E`/ End|To the end of the 'Filter'|
-|`CTRL` + `J` / Down Arrow (:arrow_down:)|Scroll json buffer 1 line downwards|
-|`CTRL` + `K` / Up Arrow (:arrow_up:)|Scroll json buffer 1 line upwards|
-|`CTRL` + `G`|Scroll json buffer to bottom|
-|`CTRL` + `T`|Scroll json buffer to top|
-|`CTRL` + `N` / PageDown|Scroll json buffer 'Page Down'|
-|`CTRL` + `P` / PageUp|Scroll json buffer 'Page Up'|
-|`ESC`|Hide a candidate box|
