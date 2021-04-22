@@ -1,13 +1,11 @@
 package yiq
 
 import (
+	"github.com/nsf/termbox-go"
 	"io"
 	"io/ioutil"
 	"regexp"
 	"strings"
-	"time"
-
-	"github.com/nsf/termbox-go"
 )
 
 const (
@@ -65,25 +63,12 @@ func (e *Engine) Run() *EngineResult {
 	var contents []string = []string{""}
 
 	for {
-		t := time.AfterFunc(100*time.Millisecond, func() {
-			e.candidates = []string{}
-			e.autocomplete = ""
-			contents = e.getContents(contents)
-			e.makeCandidates()
-			e.setCandidateData()
+		e.candidates = []string{}
+		e.autocomplete = ""
+		contents = e.getContents(contents)
+		e.makeCandidates()
+		e.setCandidateData()
 
-			ta := &TerminalDrawAttributes{
-				Query:           e.query.StringGet(),
-				CursorOffsetX:   e.cursorOffsetX,
-				Contents:        contents,
-				CandidateIndex:  e.candidateidx,
-				ContentsOffsetY: e.contentOffset,
-				Complete:        e.autocomplete,
-				Candidates:      e.candidates,
-			}
-
-			e.term.draw(ta)
-		})
 		ta := &TerminalDrawAttributes{
 			Query:           e.query.StringGet(),
 			CursorOffsetX:   e.cursorOffsetX,
@@ -93,8 +78,8 @@ func (e *Engine) Run() *EngineResult {
 			Complete:        e.autocomplete,
 			Candidates:      e.candidates,
 		}
-
 		e.term.draw(ta)
+
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
 			switch ev.Key {
@@ -190,7 +175,6 @@ func (e *Engine) Run() *EngineResult {
 			break
 		default:
 		}
-		t.Stop()
 	}
 }
 
