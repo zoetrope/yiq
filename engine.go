@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"regexp"
 	"strings"
+	"time"
 )
 
 const (
@@ -60,15 +61,22 @@ func (e *Engine) Run() *EngineResult {
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputAlt)
 
+	eventCh := make(chan termbox.Event)
+	go func() {
+		for {
+			ev := termbox.PollEvent()
+			eventCh <- ev
+			if (ev.Type == termbox.EventKey &&  ev.Key == termbox.KeyCtrlC) ||
+				ev.Type == termbox.EventError {
+				return
+			}
+		}
+	}()
+
 	var contents []string = []string{""}
 
+	t := time.NewTimer(100*time.Millisecond)
 	for {
-		e.candidates = []string{}
-		e.autocomplete = ""
-		contents = e.getContents(contents)
-		e.makeCandidates()
-		e.setCandidateData()
-
 		ta := &TerminalDrawAttributes{
 			Query:           e.query.StringGet(),
 			CursorOffsetX:   e.cursorOffsetX,
@@ -80,100 +88,110 @@ func (e *Engine) Run() *EngineResult {
 		}
 		e.term.draw(ta)
 
-		switch ev := termbox.PollEvent(); ev.Type {
-		case termbox.EventKey:
-			switch ev.Key {
-			case 0:
-				if ev.Mod == termbox.ModAlt { // alt+something key shortcuts
-					switch ev.Ch {
-					case 'f':
-						// move one word forward
-						filter := e.query.StringGet()
-						if len(filter) > e.cursorOffsetX {
-							n := strings.IndexAny(filter[e.cursorOffsetX:], "[.")
-							if n == -1 {
-								e.cursorOffsetX = len(filter)
-							} else {
-								e.cursorOffsetX += n + 1
+		select {
+		case <-t.C:
+			e.candidates = []string{}
+			e.autocomplete = ""
+			contents = e.getContents(contents)
+			e.makeCandidates()
+			e.setCandidateData()
+		case ev := <-eventCh:
+			t.Reset(100*time.Millisecond)
+			switch ev.Type {
+			case termbox.EventKey:
+				switch ev.Key {
+				case 0:
+					if ev.Mod == termbox.ModAlt { // alt+something key shortcuts
+						switch ev.Ch {
+						case 'f':
+							// move one word forward
+							filter := e.query.StringGet()
+							if len(filter) > e.cursorOffsetX {
+								n := strings.IndexAny(filter[e.cursorOffsetX:], "[.")
+								if n == -1 {
+									e.cursorOffsetX = len(filter)
+								} else {
+									e.cursorOffsetX += n + 1
+								}
+							}
+						case 'b':
+							// move one word backwards
+							filter := e.query.StringGet()
+							if 0 < e.cursorOffsetX {
+								n := strings.LastIndexAny(filter[:e.cursorOffsetX], "[.")
+								if n == -1 {
+									e.cursorOffsetX = 0
+								} else {
+									e.cursorOffsetX = n
+								}
 							}
 						}
-					case 'b':
-						// move one word backwards
-						filter := e.query.StringGet()
-						if 0 < e.cursorOffsetX {
-							n := strings.LastIndexAny(filter[:e.cursorOffsetX], "[.")
-							if n == -1 {
-								e.cursorOffsetX = 0
-							} else {
-								e.cursorOffsetX = n
-							}
-						}
+					} else {
+						e.inputChar(ev.Ch)
 					}
-				} else {
-					e.inputChar(ev.Ch)
-				}
-			case termbox.KeySpace:
-				e.inputChar(32)
-			case termbox.KeyBackspace, termbox.KeyBackspace2:
-				// delete previous char
-				if e.cursorOffsetX > 0 {
-					_ = e.query.Delete(e.cursorOffsetX - 1)
-					e.cursorOffsetX -= 1
-				}
-			case termbox.KeyDelete:
-				e.query.Delete(e.cursorOffsetX) // delete next char
-			case termbox.KeyCtrlU:
-				e.query.Clear()
-			case termbox.KeyTab:
-				e.tabAction()
-			case termbox.KeyArrowLeft:
-				// move cursor left
-				if e.cursorOffsetX > 0 {
-					e.cursorOffsetX -= 1
-				}
-			case termbox.KeyArrowRight:
-				// move cursor right
-				if len(e.query.Get()) > e.cursorOffsetX {
-					e.cursorOffsetX += 1
-				}
-			case termbox.KeyHome, termbox.KeyCtrlA: // move to start of line
-				e.cursorOffsetX = 0
-			case termbox.KeyEnd, termbox.KeyCtrlE: // move to end of line
-				e.cursorOffsetX = len(e.query.Get())
-			case termbox.KeyCtrlW:
-				// delete the word before the cursor
-				e.deleteWordBackward()
-			case termbox.KeyCtrlK, termbox.KeyArrowUp:
-				e.scrollToAbove()
-			case termbox.KeyCtrlJ, termbox.KeyArrowDown:
-				e.scrollToBelow()
-			case termbox.KeyCtrlN, termbox.KeyPgdn:
-				_, h := termbox.Size()
-				e.scrollPageDown(len(contents), h)
-			case termbox.KeyCtrlP, termbox.KeyPgup:
-				_, h := termbox.Size()
-				e.scrollPageUp(h)
-			case termbox.KeyEsc:
-				e.candidatemode = false
-			case termbox.KeyEnter:
-				if !e.candidatemode {
-					cc, err := yqrun(e.query.StringGet(), e.json, e.args)
+				case termbox.KeySpace:
+					e.inputChar(32)
+				case termbox.KeyBackspace, termbox.KeyBackspace2:
+					// delete previous char
+					if e.cursorOffsetX > 0 {
+						_ = e.query.Delete(e.cursorOffsetX - 1)
+						e.cursorOffsetX -= 1
+					}
+				case termbox.KeyDelete:
+					e.query.Delete(e.cursorOffsetX) // delete next char
+				case termbox.KeyCtrlU:
+					e.query.Clear()
+				case termbox.KeyTab:
+					e.tabAction()
+				case termbox.KeyArrowLeft:
+					// move cursor left
+					if e.cursorOffsetX > 0 {
+						e.cursorOffsetX -= 1
+					}
+				case termbox.KeyArrowRight:
+					// move cursor right
+					if len(e.query.Get()) > e.cursorOffsetX {
+						e.cursorOffsetX += 1
+					}
+				case termbox.KeyHome, termbox.KeyCtrlA: // move to start of line
+					e.cursorOffsetX = 0
+				case termbox.KeyEnd, termbox.KeyCtrlE: // move to end of line
+					e.cursorOffsetX = len(e.query.Get())
+				case termbox.KeyCtrlW:
+					// delete the word before the cursor
+					e.deleteWordBackward()
+				case termbox.KeyCtrlK, termbox.KeyArrowUp:
+					e.scrollToAbove()
+				case termbox.KeyCtrlJ, termbox.KeyArrowDown:
+					e.scrollToBelow()
+				case termbox.KeyCtrlN, termbox.KeyPgdn:
+					_, h := termbox.Size()
+					e.scrollPageDown(len(contents), h)
+				case termbox.KeyCtrlP, termbox.KeyPgup:
+					_, h := termbox.Size()
+					e.scrollPageUp(h)
+				case termbox.KeyEsc:
+					e.candidatemode = false
+				case termbox.KeyEnter:
+					if !e.candidatemode {
+						cc, err := yqrun(e.query.StringGet(), e.json, e.args)
 
-					return &EngineResult{
-						Content: cc,
-						Qs:      e.query.StringGet(),
-						Err:     err,
+						return &EngineResult{
+							Content: cc,
+							Qs:      e.query.StringGet(),
+							Err:     err,
+						}
 					}
+					e.confirmCandidate()
+				case termbox.KeyCtrlC:
+					return &EngineResult{}
+				default:
 				}
-				e.confirmCandidate()
-			case termbox.KeyCtrlC:
-				return &EngineResult{}
+			case termbox.EventError:
+				panic(ev.Err)
+				break
 			default:
 			}
-		case termbox.EventError:
-			panic(ev.Err)
-			break
-		default:
 		}
 	}
 }
